@@ -1,54 +1,67 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.TimedRobot;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Subsystems.Shooter.ShooterSubsystem;
+import frc.robot.Subsystems.Climb.ClimbSubsystem;
+import frc.robot.Subsystems.Hood.HoodSubsystem;
+import frc.robot.Subsystems.Intake.IntakeSubsystem;
 
 public class Robot extends TimedRobot {
 
     private Command m_autonomousCommand;
-    private RobotContainer m_robotContainer;
+    public CommandSwerveDrivetrain drivetrain = new CommandSwerveDrivetrain(null, null);
+    public ShooterSubsystem shooter = new ShooterSubsystem(drivetrain);
+    private static final CommandXboxController driver = new CommandXboxController(0);
+    public IntakeSubsystem intake = new IntakeSubsystem();
+    public HoodSubsystem hood = new HoodSubsystem();
+    public ClimbSubsystem climb = new ClimbSubsystem();
+    public static CommandXboxController getDriver() {
+        return driver;
+    }
 
-    @Override
-    public void robotInit() {
-        // RobotContainer başlatılır
-        m_robotContainer = new RobotContainer();
+    public Robot() {
+        driver.a().onTrue(shooter.start(true));
+        driver.rightTrigger().whileTrue(drivetrain.turnToAngleCommand());
+        driver.b().onTrue(climb.setClimb(true)).onFalse(climb.setClimb(false));
+        driver.x().onTrue(intake.start(true,true )).onFalse(intake.start(false, true));
+        driver.leftTrigger().onTrue(intake.start(true,false)).onFalse(intake.start(false, false));
     }
 
     @Override
     public void robotPeriodic() {
-        // Command-Based mimarinin KALBİ: Bütün komutları ve durumları yürütür
         CommandScheduler.getInstance().run();
     }
 
     @Override
-    public void disabledInit() {}
-
-    @Override
-    public void disabledPeriodic() {}
-
-    @Override
     public void autonomousInit() {
-        m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
         if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
+            CommandScheduler.getInstance().schedule(m_autonomousCommand);
         }
     }
 
     @Override
-    public void autonomousPeriodic() {}
+    public void autonomousPeriodic() {
+    }
 
     @Override
     public void teleopInit() {
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.cancel();
-        }
     }
 
     @Override
     public void teleopPeriodic() {
-        // İçerisi boş kalır! Tüm kontrol CommandScheduler ve RobotContainer üzerindedir.
+    }
+
+    @Override
+    public void disabledInit() {
+    }
+
+    @Override
+    public void disabledPeriodic() {
     }
 
     @Override
@@ -57,5 +70,16 @@ public class Robot extends TimedRobot {
     }
 
     @Override
-    public void testPeriodic() {}
+    public void simulationInit() {
+    }
+
+    @Override
+    public void simulationPeriodic() {
+
+    }
+
+    @Override
+    public void robotInit() {
+    }
+
 }

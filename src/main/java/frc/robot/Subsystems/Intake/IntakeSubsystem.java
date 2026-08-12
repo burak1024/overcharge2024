@@ -17,6 +17,12 @@ public class IntakeSubsystem extends SubsystemBase {
     private final VoltageOut voltage = new VoltageOut(0).withEnableFOC(true);
     private Integer[] poses = { 0, 420/360*2 };
 
+
+
+
+    public Command start(boolean isopen,boolean isamphi){
+        return this.runOnce(()->{startIntake(isopen,isamphi);});
+    }
     private void driveIntake() {
         if (poses[0] == getIntakePos()) {
             intakeMotorL.setControl(motion.withPosition(poses[1]));
@@ -64,7 +70,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void startIntake(boolean isopen, boolean isamphi) {
-        if (isopen && !isamphi) {
+     if (isopen && !isamphi) {
             driveIntake();
             driveRoller();
         } else if (isopen && isamphi)

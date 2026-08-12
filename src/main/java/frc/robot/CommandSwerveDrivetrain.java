@@ -47,7 +47,7 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     
 
     public Boolean isReady = false;
-    
+    private static CommandSwerveDrivetrain instance;
     
     private final Translation2d target = new Translation2d(0,4.0);
     public final Rotation2d getAngle(){
@@ -55,6 +55,15 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
         Translation2d desiredDeg = target.minus(robotpose);
         return new Rotation2d(desiredDeg.getX(),desiredDeg.getY());
     }
+    public Command turnToAngleCommand() {
+        SwerveRequest.FieldCentricFacingAngle rotateRequest =new SwerveRequest.FieldCentricFacingAngle();
+        return this.applyRequest(() -> 
+        rotateRequest
+            .withVelocityX(0.0) 
+            .withVelocityY(0.0) 
+            .withTargetDirection(getAngle())
+    );
+}
 
     private boolean m_hasAppliedOperatorPerspective = false;
     public CommandSwerveDrivetrain(
@@ -74,7 +83,9 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             currentLimits.withStatorCurrentLimitEnable(true);
             currentLimits.withStatorCurrentLimit(60.0); 
             driveMotor.getConfigurator().apply(currentLimits);
+            
         }
+        instance=this;
     }
 
     public Command applyRequest(Supplier<SwerveRequest> request) {
@@ -226,5 +237,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             speed.vyMetersPerSecond,
             speed.omegaRadiansPerSecond,
             getPose().getRotation().unaryMinus());
+    }
+    public static CommandSwerveDrivetrain getInstance(){
+        return instance;
     }
 }
