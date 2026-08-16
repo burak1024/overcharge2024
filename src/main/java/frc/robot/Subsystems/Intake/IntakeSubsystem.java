@@ -9,20 +9,28 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class IntakeSubsystem extends SubsystemBase {
-    private final TalonFX intakeMotorL = new TalonFX(0);
-    private final TalonFX intakeMotorR = new TalonFX(0);
-    private final TalonFX RollerMotorR = new TalonFX(0);
-    private final TalonFX RollerMotorL = new TalonFX(0);
+    private final TalonFX intakeMotorL = new TalonFX(IntakeConstants.INTAKE_MOTOR_L_ID);
+    private final TalonFX intakeMotorR = new TalonFX(IntakeConstants.INTAKE_MOTOR_R_ID);
+    private final TalonFX RollerMotorR = new TalonFX(IntakeConstants.ROLLER_Motor_R_ID);
+    private final TalonFX RollerMotorL = new TalonFX(IntakeConstants.ROLLER_MotorL_ID);
     private final MotionMagicVoltage motion = new MotionMagicVoltage(0).withEnableFOC(true);
     private final VoltageOut voltage = new VoltageOut(0).withEnableFOC(true);
-    private Integer[] poses = { 0, 420/360*2 };
+    private Integer[] poses = { 0, 420 / 360 * 2 };
 
+    public IntakeSubsystem() {
+        intakeMotorR.getConfigurator().apply(IntakeConfig.config());
+        intakeMotorL.getConfigurator().apply(IntakeConfig.config());
+        RollerMotorL.getConfigurator().apply(IntakeConfig.config());
+        RollerMotorR.getConfigurator().apply(IntakeConfig.config());
 
-
-
-    public Command start(boolean isopen,boolean isamphi){
-        return this.runOnce(()->{startIntake(isopen,isamphi);});
     }
+
+    public Command start(boolean isopen, boolean isamphi) {
+        return this.runOnce(() -> {
+            startIntake(isopen, isamphi);
+        });
+    }
+
     private void driveIntake() {
         if (poses[0] == getIntakePos()) {
             intakeMotorL.setControl(motion.withPosition(poses[1]));
@@ -70,7 +78,7 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void startIntake(boolean isopen, boolean isamphi) {
-     if (isopen && !isamphi) {
+        if (isopen && !isamphi) {
             driveIntake();
             driveRoller();
         } else if (isopen && isamphi)

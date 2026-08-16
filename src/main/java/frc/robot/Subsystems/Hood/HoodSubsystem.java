@@ -7,8 +7,8 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.LimelightHelpers;
+import frc.robot.TreeMaps;
+import frc.robot.Limelight.LimelightHelpers;
 
 public class HoodSubsystem extends SubsystemBase {
     private final static TalonFX hoodRiser = new TalonFX(0);
@@ -16,8 +16,9 @@ public class HoodSubsystem extends SubsystemBase {
     private static final Pose2d limelight = LimelightHelpers.getBotPose2d("limelight");
     private static double abs = 0;
     private static double x = 0;
-    public HoodSubsystem() {
 
+    public HoodSubsystem() {
+        hoodRiser.getConfigurator().apply(HoodConfig.config());
     }
 
     public static void start() {
@@ -33,7 +34,7 @@ public class HoodSubsystem extends SubsystemBase {
 
     private static void sethood() {
         if (!isReady())
-        hoodRiser.setControl(motion.withPosition(Constants.hooddegMap().get(setmeasure())));
+            hoodRiser.setControl(motion.withPosition(TreeMaps.hooddegMap().get(setmeasure())));
     }
 
     public static double getMotorPos() {
@@ -41,13 +42,16 @@ public class HoodSubsystem extends SubsystemBase {
     }
 
     public static boolean isReady() {
-        return getMotorPos() > Constants.hooddegMap().get(abs) - 2.0;
+        return getMotorPos() > TreeMaps.hooddegMap().get(abs) - 2.0;
     }
-    public static void setTeamAllience(){
+
+    public static void setTeamAllience() {
         Alliance alliance = DriverStation.getAlliance().orElse(Alliance.Blue);
-        if (alliance==Alliance.Red)x=0;
-        else x=18;//attım
-    
+        if (alliance == Alliance.Red)
+            x = 0;
+        else
+            x = 18;// attım
+
     }
 
 }

@@ -1,22 +1,16 @@
 package frc.robot;
 
+
 import edu.wpi.first.math.interpolation.InterpolatingDoubleTreeMap;
 
-public class Constants {
+public class TreeMaps {
     public class LimelightConstants{
         public static final String LIMELIGHT_1_NAME= "limelight-shooter";
         public static final String LIMELIGHT_2_NAME= "limelight-shoter";
     }
-    public class ClimbConstants{
-        public static final int CLIMB_MOTOR_ID=1;
-    }
-    public class FeederConstants{
-        public static final int FEEDER_MOTOR_ID=2;
-        public static final int CANRANGE_ID=1;
-    }
-    public class HoodConstants {
-        public static final int HOOD_MOTOR_ID = 3;
-    }
+
+    
+    
     public static InterpolatingDoubleTreeMap shooterYRPMMAP(){
         InterpolatingDoubleTreeMap treeMap = new InterpolatingDoubleTreeMap();
         treeMap.put(0.0, 0.0);

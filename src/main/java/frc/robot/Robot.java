@@ -14,7 +14,7 @@ import frc.robot.Subsystems.Intake.IntakeSubsystem;
 public class Robot extends TimedRobot {
 
     private Command m_autonomousCommand;
-    public CommandSwerveDrivetrain drivetrain = new CommandSwerveDrivetrain(null, null);
+    public CommandSwerveDrivetrain drivetrain =new CommandSwerveDrivetrain(null, null);
     public ShooterSubsystem shooter = new ShooterSubsystem(drivetrain);
     private static final CommandXboxController driver = new CommandXboxController(0);
     public IntakeSubsystem intake = new IntakeSubsystem();
