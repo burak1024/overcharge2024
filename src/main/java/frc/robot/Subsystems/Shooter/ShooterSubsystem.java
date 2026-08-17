@@ -23,14 +23,14 @@ public class ShooterSubsystem extends SubsystemBase {
         ShooterMotorL.getConfigurator().apply(ShooterConfig.config());
         ShooterMotorR.getConfigurator().apply(ShooterConfig.config());
     }
-
     public Command start(boolean open) {
         return this.runOnce(() -> {
             startShoot(open);
             FeederSubsystem.startfeed(open, setShooterVoltage());
             HoodSubsystem.start();
-        });
 
+        });
+    
     }
 
     public static void startShoot(boolean shootmod) {

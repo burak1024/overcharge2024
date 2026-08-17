@@ -22,6 +22,9 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.networktables.StructArrayPublisher;
+import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -45,12 +48,19 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
 
     private ChassisSpeeds speed;
     public Double desiredDegree = 0.0;
-    
+    Pose2d poseA = new Pose2d();
+Pose2d poseB = new Pose2d();
+
+StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
+  .getStructTopic("MyPose", Pose2d.struct).publish();
+StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
+  .getStructArrayTopic("MyPoseArray", Pose2d.struct).publish();
+
 
     public Boolean isReady = false;
     private static CommandSwerveDrivetrain instance;
     
-    private final Translation2d target = new Translation2d(0,4.0);
+    private final Translation2d target = new Translation2d(1,4.0);
     public final Rotation2d getAngle(){
         Translation2d robotpose = getState().Pose.getTranslation();
         Translation2d desiredDeg = target.minus(robotpose);
@@ -173,6 +183,8 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
             this.getPigeon2().getRoll(true).getValueAsDouble(), 
             0.0
         );
+        publisher.set(poseA);
+  arrayPublisher.set(new Pose2d[] {poseA, poseB});
     }
 
     private void updateVisionForCamera(String cameraName) {

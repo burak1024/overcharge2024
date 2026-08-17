@@ -1,15 +1,15 @@
 package frc.robot.Subsystems.Intake;
 
 public class IntakeConstants {
-    public static final int INTAKE_MOTOR_L_ID=1;
-        public static final int INTAKE_MOTOR_R_ID=1;
-        public static final int ROLLER_MotorL_ID=1;
-        public static final int ROLLER_Motor_R_ID=1;
+    public static final int INTAKE_MOTOR_L_ID = 7;
+    public static final int INTAKE_MOTOR_R_ID = 8;
+    public static final int ROLLER_MotorL_ID = 9;
+    public static final int ROLLER_Motor_R_ID = 10;
 
-        public static final int kS =0;
-        public static final int kV=0;
-        public static final int kA=0;
-        public static final int kP=0;
-        public static final int kI=0;
-        public static final int kD=0;
+    public static final double kS = 0.25;
+    public static final double kV = 0.119;
+    public static final double kA = 0.01;
+    public static final double kP = 0.01;
+    public static final double kI = 0.01;
+    public static final double kD = 0.01;
 }
