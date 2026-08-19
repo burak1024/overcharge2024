@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
     public IntakeSubsystem intake = new IntakeSubsystem();
     public HoodSubsystem hood = new HoodSubsystem();
     public ClimbSubsystem climb = new ClimbSubsystem();
+
     public static CommandXboxController getDriver() {
         return driver;
     }
@@ -39,7 +40,7 @@ public class Robot extends TimedRobot {
                 drivetrain.applyRequest(() -> new SwerveRequest.FieldCentric()
                         .withVelocityX(-dualshock.getLeftY() * MaxSpeed)
                         .withVelocityY(-dualshock.getLeftX() * MaxSpeed)
-                        .withRotationalRate(MathUtil.applyDeadband(-dualshock.getRightX(), 0.5)*MaxAngularRate)
+                        .withRotationalRate(MathUtil.applyDeadband(-dualshock.getRightX(), 0.5) * MaxAngularRate)
 
                 ));
         driver.a().onTrue(shooter.start(true));

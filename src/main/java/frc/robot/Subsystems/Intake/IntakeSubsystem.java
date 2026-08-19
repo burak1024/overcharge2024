@@ -15,7 +15,6 @@ public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX rollerMotorL = new TalonFX(IntakeConstants.ROLLER_MOTOR_L_ID);
     private final MotionMagicVoltage MotionMagic = new MotionMagicVoltage(0).withEnableFOC(true);
     private final VoltageOut Voltage = new VoltageOut(0).withEnableFOC(true);
-    
 
     public IntakeSubsystem() {
         intakeMotorR.getConfigurator().apply(IntakeConfig.config());
@@ -35,8 +34,7 @@ public class IntakeSubsystem extends SubsystemBase {
         if (Open) {
             intakeMotorL.setControl(MotionMagic.withPosition(IntakeConstants.poses[1]));
             intakeMotorR.setControl(MotionMagic.withPosition(IntakeConstants.poses[1]));
-        }
-        else {
+        } else {
             intakeMotorL.setControl(MotionMagic.withPosition(IntakeConstants.poses[0]));
             intakeMotorR.setControl(MotionMagic.withPosition(IntakeConstants.poses[0]));
         }

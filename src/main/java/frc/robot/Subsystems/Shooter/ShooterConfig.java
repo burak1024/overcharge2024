@@ -2,7 +2,6 @@ package frc.robot.Subsystems.Shooter;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-
 public class ShooterConfig {
     public static TalonFXConfiguration config() {
         TalonFXConfiguration config = new TalonFXConfiguration();

@@ -2,7 +2,6 @@ package frc.robot.Subsystems.Feeder;
 
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
-
 public class FeederConfig {
     public static TalonFXConfiguration config() {
         TalonFXConfiguration config = new TalonFXConfiguration();

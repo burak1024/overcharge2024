@@ -42,45 +42,45 @@ public class CommandSwerveDrivetrain extends TunerSwerveDrivetrain implements Su
     private double m_lastSimTime;
 
     private final SwerveRequest.ApplyRobotSpeeds m_pathApplyRobotSpeeds = new SwerveRequest.ApplyRobotSpeeds();
-    //private final SwerveRequest.SwerveDriveBrake brakeRequest = new SwerveRequest.SwerveDriveBrake();
+    // private final SwerveRequest.SwerveDriveBrake brakeRequest = new
+    // SwerveRequest.SwerveDriveBrake();
     private static final Rotation2d kBlueAlliancePerspectiveRotation = Rotation2d.kZero;
     private static final Rotation2d kRedAlliancePerspectiveRotation = Rotation2d.k180deg;
 
     private ChassisSpeeds speed;
     public Double desiredDegree = 0.0;
     Pose2d poseA = new Pose2d();
-Pose2d poseB = new Pose2d();
+    Pose2d poseB = new Pose2d();
 
-StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
-  .getStructTopic("MyPose", Pose2d.struct).publish();
-StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
-  .getStructArrayTopic("MyPoseArray", Pose2d.struct).publish();
-
+    StructPublisher<Pose2d> publisher = NetworkTableInstance.getDefault()
+            .getStructTopic("MyPose", Pose2d.struct).publish();
+    StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
+            .getStructArrayTopic("MyPoseArray", Pose2d.struct).publish();
 
     public Boolean isReady = false;
     private static CommandSwerveDrivetrain instance;
-    
-    private final Translation2d target = new Translation2d(1,4.0);
-    public final Rotation2d getAngle(){
+
+    private final Translation2d target = new Translation2d(1, 4.0);
+
+    public final Rotation2d getAngle() {
         Translation2d robotpose = getState().Pose.getTranslation();
         Translation2d desiredDeg = target.minus(robotpose);
-        return new Rotation2d(desiredDeg.getX(),desiredDeg.getY());
+        return new Rotation2d(desiredDeg.getX(), desiredDeg.getY());
     }
+
     public Command turnToAngleCommand() {
-        SwerveRequest.FieldCentricFacingAngle rotateRequest =new SwerveRequest.FieldCentricFacingAngle();
-        return this.applyRequest(() -> 
-        rotateRequest
-            .withVelocityX(0.0) 
-            .withVelocityY(0.0) 
-            .withTargetDirection(getAngle())
-    );
-}
+        SwerveRequest.FieldCentricFacingAngle rotateRequest = new SwerveRequest.FieldCentricFacingAngle();
+        return this.applyRequest(() -> rotateRequest
+                .withVelocityX(0.0)
+                .withVelocityY(0.0)
+                .withTargetDirection(getAngle()));
+    }
 
     private boolean m_hasAppliedOperatorPerspective = false;
+
     public CommandSwerveDrivetrain(
-        SwerveDrivetrainConstants drivetrainConstants,
-        SwerveModuleConstants<?, ?, ?>... modules
-    ){
+            SwerveDrivetrainConstants drivetrainConstants,
+            SwerveModuleConstants<?, ?, ?>... modules) {
         super(drivetrainConstants, modules);
         if (Utils.isSimulation()) {
             startSimThread();
@@ -92,52 +92,52 @@ StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
             CurrentLimitsConfigs currentLimits = new CurrentLimitsConfigs();
             driveMotor.getConfigurator().refresh(currentLimits);
             currentLimits.withStatorCurrentLimitEnable(true);
-            currentLimits.withStatorCurrentLimit(60.0); 
+            currentLimits.withStatorCurrentLimit(60.0);
             driveMotor.getConfigurator().apply(currentLimits);
-            
+
         }
-        instance=this;
+        instance = this;
     }
 
     public Command applyRequest(Supplier<SwerveRequest> request) {
         return run(() -> this.setControl(request.get()));
     }
-    
+
     // CommandSwerveDrivetrain.java içinde:
     public Pose2d getPose() {
         return this.getState().Pose;
     }
 
-     private void configureAutoBuilder() {
+    private void configureAutoBuilder() {
         try {
             var config = RobotConfig.fromGUISettings();
             AutoBuilder.configure(
-                () -> getState().Pose,   // Supplier of current robot pose
-                this::resetPoseMG1,         // Consumer for seeding pose against auto
-                () -> getState().Speeds, // Supplier of current robot speeds
-                // Consumer of ChassisSpeeds and feedforwards to drive the robot
-                (speeds, feedforwards) -> setControl(
-                    m_pathApplyRobotSpeeds.withSpeeds(ChassisSpeeds.discretize(speeds, 0.020))
-                        .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
-                        .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())
-                ),
-                new PPHolonomicDriveController(
-                    // PID constants for translation
-                    new PIDConstants(10, 0, 0),//p10
-                    // PID constants for rotation
-                    new PIDConstants(7, 0, 0)
-                ),
-                config,
-                // Assume the path needs to be flipped for Red vs Blue, this is normally the case
-                () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
-                this // Subsystem for requirements
+                    () -> getState().Pose, // Supplier of current robot pose
+                    this::resetPoseMG1, // Consumer for seeding pose against auto
+                    () -> getState().Speeds, // Supplier of current robot speeds
+                    // Consumer of ChassisSpeeds and feedforwards to drive the robot
+                    (speeds, feedforwards) -> setControl(
+                            m_pathApplyRobotSpeeds.withSpeeds(ChassisSpeeds.discretize(speeds, 0.020))
+                                    .withWheelForceFeedforwardsX(feedforwards.robotRelativeForcesXNewtons())
+                                    .withWheelForceFeedforwardsY(feedforwards.robotRelativeForcesYNewtons())),
+                    new PPHolonomicDriveController(
+                            // PID constants for translation
+                            new PIDConstants(10, 0, 0), // p10
+                            // PID constants for rotation
+                            new PIDConstants(7, 0, 0)),
+                    config,
+                    // Assume the path needs to be flipped for Red vs Blue, this is normally the
+                    // case
+                    () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
+                    this // Subsystem for requirements
             );
         } catch (Exception ex) {
-            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder", ex.getStackTrace());
+            DriverStation.reportError("Failed to load PathPlanner config and configure AutoBuilder",
+                    ex.getStackTrace());
         }
     }
 
-    private void resetPoseMG1(Pose2d pose){
+    private void resetPoseMG1(Pose2d pose) {
         updateYawMG1();
     }
 
@@ -146,14 +146,12 @@ StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
         if (!m_hasAppliedOperatorPerspective || DriverStation.isDisabled()) {
             DriverStation.getAlliance().ifPresent(allianceColor -> {
                 setOperatorPerspectiveForward(
-                    allianceColor == Alliance.Red
-                        ? kRedAlliancePerspectiveRotation
-                        : kBlueAlliancePerspectiveRotation
-                );
+                        allianceColor == Alliance.Red
+                                ? kRedAlliancePerspectiveRotation
+                                : kBlueAlliancePerspectiveRotation);
                 m_hasAppliedOperatorPerspective = true;
             });
         }
-
 
         updateLimelightOrientation();
 
@@ -168,40 +166,42 @@ StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
         double robotAngularVelocity = this.getPigeon2().getAngularVelocityZWorld().getValueAsDouble();
 
         LimelightHelpers.SetRobotOrientation(
-            LimelightConstants.LIMELIGHT_1_NAME, 
-            robotYaw, 
-            robotAngularVelocity, 
-            0, 0, 0, 0
-        );
+                LimelightConstants.LIMELIGHT_1_NAME,
+                robotYaw,
+                robotAngularVelocity,
+                0, 0, 0, 0);
 
         LimelightHelpers.SetRobotOrientation(
-            LimelightConstants.LIMELIGHT_2_NAME, 
-            robotYaw, 
-            robotAngularVelocity, 
-            this.getPigeon2().getPitch(true).getValueAsDouble(), 
-            0.0,
-            this.getPigeon2().getRoll(true).getValueAsDouble(), 
-            0.0
-        );
+                LimelightConstants.LIMELIGHT_2_NAME,
+                robotYaw,
+                robotAngularVelocity,
+                this.getPigeon2().getPitch(true).getValueAsDouble(),
+                0.0,
+                this.getPigeon2().getRoll(true).getValueAsDouble(),
+                0.0);
         publisher.set(poseA);
-  arrayPublisher.set(new Pose2d[] {poseA, poseB});
+        arrayPublisher.set(new Pose2d[] { poseA, poseB });
     }
 
     private void updateVisionForCamera(String cameraName) {
         LimelightHelpers.PoseEstimate measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue_MegaTag2(cameraName);
-        if(measurement == null) return;
-        if (measurement.tagCount == 0 || measurement.pose == null) return;
+        if (measurement == null)
+            return;
+        if (measurement.tagCount == 0 || measurement.pose == null)
+            return;
         addVisionMeasurement(measurement.pose, measurement.timestampSeconds, VecBuilder.fill(0.4, 0.4, 999.0));
     }
 
-    private void updateVisionMG1(String cameraName){
+    private void updateVisionMG1(String cameraName) {
         LimelightHelpers.PoseEstimate measurement = LimelightHelpers.getBotPoseEstimate_wpiBlue(cameraName);
-        if(measurement == null) return;
-        if (measurement.tagCount == 0 || measurement.pose == null) return;
+        if (measurement == null)
+            return;
+        if (measurement.tagCount == 0 || measurement.pose == null)
+            return;
         addVisionMeasurement(measurement.pose, measurement.timestampSeconds, VecBuilder.fill(0.25, 1.0, 3.0));
     }
 
-    public void updateYawMG1(){
+    public void updateYawMG1() {
         updateVisionMG1(LimelightConstants.LIMELIGHT_1_NAME);
         updateVisionMG1(LimelightConstants.LIMELIGHT_2_NAME);
     }
@@ -221,11 +221,11 @@ StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
 
     @Override
     public void addVisionMeasurement(
-        Pose2d visionRobotPoseMeters,
-        double timestampSeconds,
-        Matrix<N3, N1> visionMeasurementStdDevs
-    ) {
-        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds), visionMeasurementStdDevs);
+            Pose2d visionRobotPoseMeters,
+            double timestampSeconds,
+            Matrix<N3, N1> visionMeasurementStdDevs) {
+        super.addVisionMeasurement(visionRobotPoseMeters, Utils.fpgaToCurrentTime(timestampSeconds),
+                visionMeasurementStdDevs);
     }
 
     @Override
@@ -233,25 +233,26 @@ StructArrayPublisher<Pose2d> arrayPublisher = NetworkTableInstance.getDefault()
         return super.samplePoseAt(Utils.fpgaToCurrentTime(timestampSeconds));
     }
 
-    /*public void setTarget(Translation2d target){
-        this.target = target;
-    }*/
+    /*
+     * public void setTarget(Translation2d target){
+     * this.target = target;
+     * }
+     */
 
-    
-
-    public Double getError(){
+    public Double getError() {
         return Math.abs(desiredDegree - getPose().getRotation().getDegrees());
     }
 
-    public ChassisSpeeds getSpeed(){
+    public ChassisSpeeds getSpeed() {
         speed = super.getState().Speeds;
         return ChassisSpeeds.fromFieldRelativeSpeeds(
-            speed.vxMetersPerSecond, 
-            speed.vyMetersPerSecond,
-            speed.omegaRadiansPerSecond,
-            getPose().getRotation().unaryMinus());
+                speed.vxMetersPerSecond,
+                speed.vyMetersPerSecond,
+                speed.omegaRadiansPerSecond,
+                getPose().getRotation().unaryMinus());
     }
-    public static CommandSwerveDrivetrain getInstance(){
+
+    public static CommandSwerveDrivetrain getInstance() {
         return instance;
     }
 }

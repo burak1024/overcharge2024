@@ -23,6 +23,7 @@ public class ShooterSubsystem extends SubsystemBase {
         shooterMotorL.getConfigurator().apply(ShooterConfig.config());
         shooterMotorR.getConfigurator().apply(ShooterConfig.config());
     }
+
     public Command start(boolean open) {
         return this.runOnce(() -> {
             startShoot(open);
@@ -30,7 +31,7 @@ public class ShooterSubsystem extends SubsystemBase {
             HoodSubsystem.start();
 
         });
-    
+
     }
 
     public static void startShoot(boolean ShootMod) {

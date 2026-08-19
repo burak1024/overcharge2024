@@ -1,6 +1,5 @@
 package frc.robot.Subsystems.Hood;
 
-
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 
@@ -33,14 +32,15 @@ public class HoodSubsystem extends SubsystemBase {
         return Math.abs(measure);
 
     }
-    private static double setPos(){
+
+    private static double setPos() {
         return TreeMaps.HoodDegreeMap().get(setMeasure());
     }
 
     private static void setHood() {
         hoodRiser.setControl(MotionMagic.withPosition(setPos()));
     }
-    
+
     private static double getMotorPos() {
         return hoodRiser.getPosition().getValueAsDouble();
     }
