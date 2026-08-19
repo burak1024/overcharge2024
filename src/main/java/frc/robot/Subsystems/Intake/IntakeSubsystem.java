@@ -11,89 +11,89 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class IntakeSubsystem extends SubsystemBase {
     private final TalonFX intakeMotorL = new TalonFX(IntakeConstants.INTAKE_MOTOR_L_ID);
     private final TalonFX intakeMotorR = new TalonFX(IntakeConstants.INTAKE_MOTOR_R_ID);
-    private final TalonFX RollerMotorR = new TalonFX(IntakeConstants.ROLLER_Motor_R_ID);
-    private final TalonFX RollerMotorL = new TalonFX(IntakeConstants.ROLLER_MotorL_ID);
-    private final MotionMagicVoltage motion = new MotionMagicVoltage(0).withEnableFOC(true);
-    private final VoltageOut voltage = new VoltageOut(0).withEnableFOC(true);
-    private Integer[] poses = { 0, 420 / 360 * 2 };
+    private final TalonFX rollerMotorR = new TalonFX(IntakeConstants.ROLLER_MOTOR_R_ID);
+    private final TalonFX rollerMotorL = new TalonFX(IntakeConstants.ROLLER_MOTOR_L_ID);
+    private final MotionMagicVoltage MotionMagic = new MotionMagicVoltage(0).withEnableFOC(true);
+    private final VoltageOut Voltage = new VoltageOut(0).withEnableFOC(true);
+    
 
     public IntakeSubsystem() {
         intakeMotorR.getConfigurator().apply(IntakeConfig.config());
         intakeMotorL.getConfigurator().apply(IntakeConfig.config());
-        RollerMotorL.getConfigurator().apply(IntakeConfig.config());
-        RollerMotorR.getConfigurator().apply(IntakeConfig.config());
+        rollerMotorL.getConfigurator().apply(IntakeConfig.config());
+        rollerMotorR.getConfigurator().apply(IntakeConfig.config());
 
     }
 
-    public Command start(boolean isopen, boolean isamphi) {
+    public Command start(boolean Open, boolean Amphi) {
         return this.runOnce(() -> {
-            startIntake(isopen, isamphi);
+            startIntake(Open, Amphi);
         });
     }
 
-    private void driveIntake() {
-        if (poses[0] == getIntakePos()) {
-            intakeMotorL.setControl(motion.withPosition(poses[1]));
-            intakeMotorR.setControl(motion.withPosition(poses[1]));
-        } else if (poses[0] + 35 > getIntakePos()) {
-            intakeMotorL.setControl(motion.withPosition(poses[1]));
-            intakeMotorR.setControl(motion.withPosition(poses[1]));
+    private void driveIntake(boolean Open) {
+        if (Open) {
+            intakeMotorL.setControl(MotionMagic.withPosition(IntakeConstants.poses[1]));
+            intakeMotorR.setControl(MotionMagic.withPosition(IntakeConstants.poses[1]));
+        }
+        else {
+            intakeMotorL.setControl(MotionMagic.withPosition(IntakeConstants.poses[0]));
+            intakeMotorR.setControl(MotionMagic.withPosition(IntakeConstants.poses[0]));
         }
 
     }
 
-    private Command amphicom() {
+    private Command amphiPick() {
         return Commands.sequence(
                 this.run(() -> {
-                    intakeMotorL.setControl(motion.withPosition(poses[0]));
-                    intakeMotorR.setControl(motion.withPosition(poses[0]));
+                    intakeMotorL.setControl(MotionMagic.withPosition(IntakeConstants.poses[0]));
+                    intakeMotorR.setControl(MotionMagic.withPosition(IntakeConstants.poses[0]));
                 }).withTimeout(0.5),
                 this.run(() -> {
-                    RollerMotorL.setControl(voltage.withOutput(5.0));
-                    RollerMotorR.setControl(voltage.withOutput(5.0));
+                    rollerMotorL.setControl(Voltage.withOutput(5.0));
+                    rollerMotorR.setControl(Voltage.withOutput(5.0));
                 }).withTimeout(1.0));
     }
 
-    private Command amphishot() {
+    private Command amphiShot() {
         return Commands.sequence(
                 this.run(() -> {
-                    intakeMotorL.setControl(motion.withPosition(poses[1]));
-                    intakeMotorL.setControl(motion.withPosition(poses[1]));
+                    intakeMotorL.setControl(MotionMagic.withPosition(IntakeConstants.poses[1]));
+                    intakeMotorL.setControl(MotionMagic.withPosition(IntakeConstants.poses[1]));
                 }).withTimeout(1.0),
                 this.run(() -> {
-                    RollerMotorL.setControl(voltage.withOutput(-5.0));
-                    RollerMotorR.setControl(voltage.withOutput(-5.0));
+                    rollerMotorL.setControl(Voltage.withOutput(-5.0));
+                    rollerMotorR.setControl(Voltage.withOutput(-5.0));
                 }).withTimeout(1.0)
 
         );
     }
 
     private void driveRoller() {
-        RollerMotorR.setControl(voltage.withOutput(3.0));
-        RollerMotorL.setControl(voltage.withOutput(3.0));
+        rollerMotorR.setControl(Voltage.withOutput(3.0));
+        rollerMotorL.setControl(Voltage.withOutput(3.0));
     }
 
     public double getIntakePos() {
         return intakeMotorL.getPosition().getValueAsDouble();
     }
 
-    public void startIntake(boolean isopen, boolean isamphi) {
-        if (isopen && !isamphi) {
-            driveIntake();
+    public void startIntake(boolean Open, boolean Amphi) {
+        if (Open && !Amphi) {
+            driveIntake(true);
             driveRoller();
-        } else if (isopen && isamphi)
-            amphicom();
-        else if (!isopen && isamphi)
-            amphishot();
+        } else if (Open && Amphi)
+            amphiPick();
+        else if (!Open && Amphi)
+            amphiShot();
         else
             stop();
 
     }
 
     public void stop() {
-        intakeMotorL.setControl(motion.withPosition(poses[0]));
-        intakeMotorR.setControl(motion.withPosition(poses[0]));
-        RollerMotorL.stopMotor();
-        RollerMotorR.stopMotor();
+        driveIntake(false);
+        rollerMotorL.stopMotor();
+        rollerMotorR.stopMotor();
     }
 }

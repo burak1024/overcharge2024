@@ -14,14 +14,14 @@ import frc.robot.TreeMaps;
 
 public class ShooterSubsystem extends SubsystemBase {
     public static CommandSwerveDrivetrain drivetrain;
-    private final static TalonFX ShooterMotorR = new TalonFX(ShooterConstants.SHOOTER_MOTOR_R_ID);
-    private final static TalonFX ShooterMotorL = new TalonFX(ShooterConstants.SHOOTER_MOTOR_L_ID);
+    private final static TalonFX shooterMotorR = new TalonFX(ShooterConstants.SHOOTER_MOTOR_R_ID);
+    private final static TalonFX shooterMotorL = new TalonFX(ShooterConstants.SHOOTER_MOTOR_L_ID);
     private final static VoltageOut voltage = new VoltageOut(0).withEnableFOC(true);
 
     public ShooterSubsystem(CommandSwerveDrivetrain drivetrain) {
         ShooterSubsystem.drivetrain = drivetrain;
-        ShooterMotorL.getConfigurator().apply(ShooterConfig.config());
-        ShooterMotorR.getConfigurator().apply(ShooterConfig.config());
+        shooterMotorL.getConfigurator().apply(ShooterConfig.config());
+        shooterMotorR.getConfigurator().apply(ShooterConfig.config());
     }
     public Command start(boolean open) {
         return this.runOnce(() -> {
@@ -33,10 +33,10 @@ public class ShooterSubsystem extends SubsystemBase {
     
     }
 
-    public static void startShoot(boolean shootmod) {
-        if (shootmod && FeederSubsystem.hasObject() && HoodSubsystem.isReady()) {
-            ShooterMotorL.setControl(voltage.withOutput(setShooterVoltage()));
-            ShooterMotorR.setControl(voltage.withOutput(setShooterVoltage()));
+    public static void startShoot(boolean ShootMod) {
+        if (ShootMod && FeederSubsystem.hasObject() && HoodSubsystem.isReady()) {
+            shooterMotorL.setControl(voltage.withOutput(setShooterVoltage()));
+            shooterMotorR.setControl(voltage.withOutput(setShooterVoltage()));
         }
 
     }
@@ -45,7 +45,7 @@ public class ShooterSubsystem extends SubsystemBase {
         Pose2d robotpos = drivetrain.getPose();
         Translation2d target = new Translation2d(0.0, 4.0);
         double measure = target.getX() - robotpos.getX();
-        return TreeMaps.shooterxMap().get(measure);
+        return TreeMaps.ShooterVoltageMap().get(measure);
     }
 
 }
