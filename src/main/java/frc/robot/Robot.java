@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.path.PathPlannerPath;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -28,14 +29,20 @@ public class Robot extends TimedRobot {
     public IntakeSubsystem intake = new IntakeSubsystem();
     public HoodSubsystem hood = new HoodSubsystem();
     public ClimbSubsystem climb = new ClimbSubsystem();
-
+    
     public static CommandXboxController getDriver() {
         return driver;
     }
 
     public static final CommandPS4Controller dualshock = new CommandPS4Controller(0);
-
+    PathPlannerPath path;
     public Robot() {
+        try {
+        path = PathPlannerPath.fromPathFile("path");
+    } catch (Exception e) {
+        System.out.println("Rota dosyası bulunamadı veya okunamadı!");
+        e.printStackTrace();
+    }
         drivetrain.setDefaultCommand(
                 drivetrain.applyRequest(() -> new SwerveRequest.FieldCentric()
                         .withVelocityX(-dualshock.getLeftY() * MaxSpeed)
